@@ -19,18 +19,24 @@ with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/dri
 #creating two empty lists for images and curresponding measurements
 images = []
 measurements = []
+cf = 0.2 #correction factor for left and right images
 
+#remember to update this for loop, looks too clumsy
 for line in lines:
-    source_path = line[0]
-    image = cv2.imread(source_path)
-    images.append(image)
-    image_flipped = np.fliplr(image)
-    images.append(image_flipped)
+    center_path = line[0]
+    left_path = line[1]
+    right_path = line[2]
+    center_image = cv2.imread(center_path)
+    left_image = cv2.imread(left_path)
+    right_image = cv2.imread(right_path)
+    center_image_flipped = np.fliplr(center_image)
+    left_image_flipped = np.fliplr(left_image)
+    right_image_flipped = np.fliplr(right_image)
+    imgs = [center_image, left_image, right_image, center_image_flipped, left_image_flipped, right_image_flipped]
+    images.extend(imgs)
     measurement = float(line[3])
-    measurements.append(measurement)
-    measurements.append(-measurement)
-
-
+    angs= [measurement, measurement+cf,measurement-cf, -measurement, -(measurement+cf), -(measurement-cf)]
+    measurements.extend(angs)
 
 """
 with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/driving_log.csv') as f:
