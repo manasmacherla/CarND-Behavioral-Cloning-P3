@@ -19,7 +19,7 @@ with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/dri
 #creating two empty lists for images and curresponding measurements
 images = []
 measurements = []
-cf = 0.2 #correction factor for left and right images
+cf = 0.25 #correction factor of the steering angle for left and right images
 
 #remember to update this for loop, looks too clumsy
 for line in lines:
@@ -67,11 +67,11 @@ model = Sequential()
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape = (160,320,3)))
 model.add(tf.keras.layers.Conv2D(6, 5, (2,4), padding="valid", activation='relu'))
 model.add(tf.keras.layers.Conv2D(12, 5, (2,2), padding="valid", activation='relu'))
-model.add(tf.keras.layers.Conv2D(12, 5, 1, padding="valid", activation='relu')) #shape = 28*28*12
-model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) #shape = 14*14*12
-model.add(tf.keras.layers.Conv2D(16, 5, 1, padding="valid", activation='relu')) #shape = 10*10*16
-model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) #shape = 5*5*16
-model.add(Flatten()) #shape = 400
+model.add(tf.keras.layers.Conv2D(12, 5, 1, padding="valid", activation='relu')) 
+model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) 
+model.add(tf.keras.layers.Conv2D(16, 5, 1, padding="valid", activation='relu')) 
+model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) 
+model.add(Flatten()) 
 model.add(tf.keras.layers.Dense(120, activation='relu'))
 model.add(tf.keras.layers.Dense(1))
 
