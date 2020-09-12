@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras import layers 
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda
+from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping2D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MSE
 
@@ -65,7 +65,8 @@ Y_train = np.array(measurements)
 
 model = Sequential()
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape = (160,320,3)))
-model.add(tf.keras.layers.Conv2D(6, 5, (2,4), padding="valid", activation='relu'))
+model.add(Cropping2D(cropping=((70,25), (0,0))))
+#model.add(tf.keras.layers.Conv2D(6, 5, (2,4), padding="valid", activation='relu'))
 model.add(tf.keras.layers.Conv2D(12, 5, (2,2), padding="valid", activation='relu'))
 model.add(tf.keras.layers.Conv2D(12, 5, 1, padding="valid", activation='relu')) 
 model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) 
