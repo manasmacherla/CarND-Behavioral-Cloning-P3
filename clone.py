@@ -27,8 +27,11 @@ for line in lines:
     left_path = line[1]
     right_path = line[2]
     center_image = cv2.imread(center_path)
+    center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2YUV)
     left_image = cv2.imread(left_path)
+    left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2YUV)
     right_image = cv2.imread(right_path)
+    right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2YUV)
     center_image_flipped = np.fliplr(center_image)
     left_image_flipped = np.fliplr(left_image)
     right_image_flipped = np.fliplr(right_image)
