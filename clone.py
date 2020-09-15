@@ -9,6 +9,10 @@ from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MSE
 
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.compat.v1.Session(config=config)
+
 lines = []
 
 #opening the csv file with the file names and measurements 
@@ -72,9 +76,12 @@ model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape = (160,320,3)))
 model.add(Cropping2D(cropping=((70,25), (0,0))))
 #model.add(tf.keras.layers.Conv2D(6, 5, (2,4), padding="valid", activation='relu'))
 model.add(tf.keras.layers.Conv2D(12, 5, (2,2), padding="valid", activation='relu'))
+model.add(tf.keras.layers.Dropout(0.4))
 model.add(tf.keras.layers.Conv2D(12, 5, 1, padding="valid", activation='relu')) 
+model.add(tf.keras.layers.Dropout(0.4))
 model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) 
 model.add(tf.keras.layers.Conv2D(16, 5, 1, padding="valid", activation='relu')) 
+model.add(tf.keras.layers.Dropout(0.4))
 model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) 
 model.add(Flatten()) 
 model.add(tf.keras.layers.Dense(120, activation='relu'))
@@ -84,7 +91,7 @@ model.add(tf.keras.layers.Dense(1))
 #print(shape)
 
 model.compile(loss='mse', optimizer = 'adam')
-history_object = model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, nb_epoch = 2)
+history_object = model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, epochs = 5)
 
 model.save('model.h5')
 
