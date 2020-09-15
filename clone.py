@@ -9,7 +9,7 @@ from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MSE
 
-from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.applications.resnet50 import ResNet50
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -73,7 +73,7 @@ with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/dri
 X_train = np.array(images)
 Y_train = np.array(measurements)
 
-model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
 
 main_input = Input(shape=(160,320,3))
 resized_input = Lambda(lambda image: tf.image.resize(image, (224, 224)))(main_input)
