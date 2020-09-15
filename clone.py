@@ -4,10 +4,12 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras import layers 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping2D
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping2D, Input
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MSE
+
+from tensorflow.keras.applications.vgg16 import VGG16
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -71,6 +73,23 @@ with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/dri
 X_train = np.array(images)
 Y_train = np.array(measurements)
 
+model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+
+main_input = Input(shape=(160,320,3))
+resized_input = Lambda(lambda image: tf.image.resize(image, (224, 224)))(main_input)
+
+model = model(resized_input)
+
+flattened1 = Flatten()(model)
+dense1 = Dense(120, activation = 'relu')(flattened1)
+predictions = Dense(1, activation = 'relu')(dense1)
+
+model = Model(inputs=main_input, outputs=predictions)
+model.compile(optimizer='Adam', loss='mse', metrics=['accuracy'])
+model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, epochs = 5)
+model.save('model.h5')
+
+"""
 model = Sequential()
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape = (160,320,3)))
 model.add(Cropping2D(cropping=((70,25), (0,0))))
@@ -86,10 +105,13 @@ model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid'))
 model.add(Flatten()) 
 model.add(tf.keras.layers.Dense(120, activation='relu'))
 model.add(tf.keras.layers.Dense(1))
+"""
 
-#shape = model.output_shape
-#print(shape)
+#trying to use pretrained model to see how it works
 
+
+
+"""
 model.compile(loss='mse', optimizer = 'adam')
 history_object = model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, epochs = 5)
 
@@ -106,6 +128,7 @@ plt.ylabel('mean squared error loss')
 plt.xlabel('epoch')
 plt.legend(['training set', 'validation set'], loc='upper right')
 plt.show()
+"""
 
 #things that can be done to further improve the model
 #adding dropout to reduce overfitting 
