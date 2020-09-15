@@ -18,7 +18,7 @@ session = tf.compat.v1.Session(config=config)
 lines = []
 
 #opening the csv file with the file names and measurements 
-with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/driving_log.csv') as csvfile:
+with open('C:/Users/manas/OneDrive - Clemson University/Documents/Self Driving Car ND/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
@@ -73,6 +73,7 @@ with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/dri
 X_train = np.array(images)
 Y_train = np.array(measurements)
 
+"""
 model = Xception(weights='imagenet', include_top=False, input_shape=(299, 299, 3))
 
 main_input = Input(shape=(160,320,3))
@@ -92,31 +93,33 @@ model.save('model.h5')
 """
 model = Sequential()
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape = (160,320,3)))
+#model.add(Lambda(lambda image: tf.image.resize(image, (299, 299))))
 model.add(Cropping2D(cropping=((70,25), (0,0))))
-#model.add(tf.keras.layers.Conv2D(6, 5, (2,4), padding="valid", activation='relu'))
-model.add(tf.keras.layers.Conv2D(12, 5, (2,2), padding="valid", activation='relu'))
+model.add(tf.keras.layers.Conv2D(24, 5, (2,4), padding="valid", activation='relu'))
+model.add(tf.keras.layers.Conv2D(46, 5, (2,2), padding="valid", activation='relu'))
+#model.add(tf.keras.layers.Dropout(0.4))
+model.add(tf.keras.layers.Conv2D(64, 5, 1, padding="valid", activation='relu')) 
 model.add(tf.keras.layers.Dropout(0.4))
-model.add(tf.keras.layers.Conv2D(12, 5, 1, padding="valid", activation='relu')) 
-model.add(tf.keras.layers.Dropout(0.4))
-model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) 
-model.add(tf.keras.layers.Conv2D(16, 5, 1, padding="valid", activation='relu')) 
+#model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) 
+model.add(tf.keras.layers.Conv2D(128, 5, 1, padding="valid", activation='relu')) 
 model.add(tf.keras.layers.Dropout(0.4))
 model.add(tf.keras.layers.MaxPooling2D(2,2,padding='valid')) 
 model.add(Flatten()) 
-model.add(tf.keras.layers.Dense(120, activation='relu'))
+model.add(tf.keras.layers.Dense(600, activation='relu'))
+model.add(tf.keras.layers.Dropout(0.4))
+model.add(tf.keras.layers.Dense(300, activation='relu'))
 model.add(tf.keras.layers.Dense(1))
-"""
 
-#trying to use pretrained model to see how it works
-
-
-
-"""
 model.compile(loss='mse', optimizer = 'adam')
 history_object = model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, epochs = 5)
 
 model.save('model.h5')
 
+#trying to use pretrained model to see how it works
+
+
+
+"""www
 ### print the keys contained in the history object
 print(history_object.history.keys())
 
