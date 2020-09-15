@@ -87,3 +87,10 @@ model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, nb_epoch = 2
 
 model.save('model.h5')
 
+#things that can be done to further improve the model
+#adding dropout to reduce overfitting 
+#using generators
+#better preprocessing - YCbCr format/ other image formats
+#transfer learning using pretrained weights ResNet, VGG16 and Nvidia end to end pipeline
+#advanced challenge track 
+
