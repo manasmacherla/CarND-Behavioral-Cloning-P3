@@ -1,6 +1,7 @@
 import cv2
 import csv
 import tensorflow as tf 
+import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras import layers 
 from tensorflow.keras.models import Sequential
@@ -83,14 +84,27 @@ model.add(tf.keras.layers.Dense(1))
 #print(shape)
 
 model.compile(loss='mse', optimizer = 'adam')
-model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, nb_epoch = 2)
+history_object = model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, nb_epoch = 2)
 
 model.save('model.h5')
+
+### print the keys contained in the history object
+print(history_object.history.keys())
+
+### plot the training and validation loss for each epoch
+plt.plot(history_object.history['loss'])
+plt.plot(history_object.history['val_loss'])
+plt.title('model mean squared error loss')
+plt.ylabel('mean squared error loss')
+plt.xlabel('epoch')
+plt.legend(['training set', 'validation set'], loc='upper right')
+plt.show()
 
 #things that can be done to further improve the model
 #adding dropout to reduce overfitting 
 #using generators
 #better preprocessing - YCbCr format/ other image formats
 #transfer learning using pretrained weights ResNet, VGG16 and Nvidia end to end pipeline
+#make a graph of the loss and accuracy of all these models
 #advanced challenge track 
 
