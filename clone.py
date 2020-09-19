@@ -73,11 +73,14 @@ with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/dri
 X_train = np.array(images)
 Y_train = np.array(measurements)
 
-"""
-model = Xception(weights='imagenet', include_top=False, input_shape=(299, 299, 3))
+
+model = Xception(weights='imagenet', include_top=False, input_shape=(72, 200, 3))
+
+for layer in model.layers:
+    layer.trainable = False
 
 main_input = Input(shape=(160,320,3))
-resized_input = Lambda(lambda image: tf.image.resize(image, (299, 299)))(main_input)
+resized_input = Lambda(lambda image: tf.image.resize(image, (72, 200)))(main_input)
 
 model = model(resized_input)
 
@@ -87,7 +90,7 @@ predictions = Dense(1, activation = 'relu')(dense1)
 
 model = Model(inputs=main_input, outputs=predictions)
 model.compile(optimizer='Adam', loss='mse', metrics=['accuracy'])
-model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, epochs = 5)
+model.fit(X_train, Y_train, validation_split = 0.2, batch_size = 16, shuffle = True, epochs = 2)
 model.save('model.h5')
 
 """
@@ -120,7 +123,7 @@ model.compile(loss='mse', optimizer = 'adam')
 history_object = model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, epochs = 5)
 
 model.save('model.h5')
-
+"""
 #trying to use pretrained model to see how it works
 
 
