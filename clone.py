@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras import layers 
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping2D, Input, Dropout
+from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping2D, Input, Dropout, Cropping2D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MSE
 
@@ -74,29 +74,30 @@ X_train = np.array(images)
 Y_train = np.array(measurements)
 
 
-model = MobileNet(weights='imagenet', include_top=False, input_shape=(66, 200, 3))
+model = MobileNet(weights='imagenet', include_top=False, input_shape=(65, 300, 3))
 
 for layer in model.layers:
     layer.trainable = False
 
 main_input = Input(shape=(160,320,3))
-resized_input = Lambda(lambda image: tf.image.resize(image, (66, 200)))(main_input)
-resized_input = Lambda(lambda image: image/255 - 0.5)(resized_input)
+#resized_input = Lambda(lambda image: tf.image.resize(image, (100, 150)))(main_input)
+resized_input = Lambda(lambda image: image/255 - 0.5)(main_input)
+resized_input = Cropping2D(cropping=((70,25), (10,10)))(resized_input)
 model = model(resized_input)
-drop1 = Dropout(0.2)(model)
+drop1 = Dropout(0.3)(model)
 flattened1 = Flatten()(drop1)
 dense1 = Dense(512, activation = 'relu')(flattened1)
-drop2 = Dropout(0.2)(dense1)
+drop2 = Dropout(0.3)(dense1)
 dense2 = Dense(256, activation = 'relu')(drop2)
-drop3 = Dropout(0.2)(dense2)
+drop3 = Dropout(0.3)(dense2)
 dense3 = Dense(64, activation = 'relu')(drop3)
-drop4 = Dropout(0.2)(dense3)
+drop4 = Dropout(0.3)(dense3)
 dense4 = Dense(32, activation = 'relu')(drop4)
 predictions = Dense(1)(dense4)
 
 model = Model(inputs=main_input, outputs=predictions)
 model.compile(optimizer='Adam', loss='mse')
-model.fit(X_train, Y_train, validation_split = 0.2, batch_size = 16, shuffle = True, epochs = 2)
+model.fit(X_train, Y_train, validation_split = 0.2, batch_size = 16, shuffle = True, epochs = 5)
 model.save('model.h5')
 
 """
