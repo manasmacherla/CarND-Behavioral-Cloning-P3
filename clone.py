@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras import layers 
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping2D, Input
+from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping2D, Input, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MSE
 
@@ -26,7 +26,7 @@ with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_Github/dri
 #creating two empty lists for images and curresponding measurements
 images = []
 measurements = []
-cf = 0.25 #correction factor of the steering angle for left and right images
+cf = 0.3 #correction factor of the steering angle for left and right images
 
 #remember to update this for loop, looks too clumsy
 for line in lines:
@@ -74,20 +74,25 @@ X_train = np.array(images)
 Y_train = np.array(measurements)
 
 
-model = MobileNet(weights='imagenet', include_top=False, input_shape=(66, 180, 3))
+model = MobileNet(weights='imagenet', include_top=False, input_shape=(66, 200, 3))
 
 for layer in model.layers:
     layer.trainable = False
 
 main_input = Input(shape=(160,320,3))
-resized_input = Lambda(lambda image: tf.image.resize(image, (66, 180)))(main_input)
-
+resized_input = Lambda(lambda image: tf.image.resize(image, (66, 200)))(main_input)
+resized_input = Lambda(lambda image: image/255 - 0.5)(resized_input)
 model = model(resized_input)
-
-flattened1 = Flatten()(model)
-dense1 = Dense(300, activation = 'relu')(flattened1)
-dense2 = Dense(120, activation = 'relu')(dense1)
-predictions = Dense(1)(dense1)
+drop1 = Dropout(0.2)(model)
+flattened1 = Flatten()(drop1)
+dense1 = Dense(512, activation = 'relu')(flattened1)
+drop2 = Dropout(0.2)(dense1)
+dense2 = Dense(256, activation = 'relu')(drop2)
+drop3 = Dropout(0.2)(dense2)
+dense3 = Dense(64, activation = 'relu')(drop3)
+drop4 = Dropout(0.2)(dense3)
+dense4 = Dense(32, activation = 'relu')(drop4)
+predictions = Dense(1)(dense4)
 
 model = Model(inputs=main_input, outputs=predictions)
 model.compile(optimizer='Adam', loss='mse')
