@@ -9,7 +9,7 @@ from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MSE
 
-from tensorflow.keras.applications.xception import Xception
+from tensorflow.keras.applications.mobilenet import MobileNet
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -18,7 +18,7 @@ session = tf.compat.v1.Session(config=config)
 lines = []
 
 #opening the csv file with the file names and measurements 
-with open('C:/Users/manas/OneDrive - Clemson University/Documents/Self Driving Car ND/driving_log.csv') as csvfile:
+with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_Github/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
@@ -74,22 +74,23 @@ X_train = np.array(images)
 Y_train = np.array(measurements)
 
 
-model = Xception(weights='imagenet', include_top=False, input_shape=(72, 200, 3))
+model = MobileNet(weights='imagenet', include_top=False, input_shape=(66, 180, 3))
 
 for layer in model.layers:
     layer.trainable = False
 
 main_input = Input(shape=(160,320,3))
-resized_input = Lambda(lambda image: tf.image.resize(image, (72, 200)))(main_input)
+resized_input = Lambda(lambda image: tf.image.resize(image, (66, 180)))(main_input)
 
 model = model(resized_input)
 
 flattened1 = Flatten()(model)
-dense1 = Dense(120, activation = 'relu')(flattened1)
-predictions = Dense(1, activation = 'relu')(dense1)
+dense1 = Dense(300, activation = 'relu')(flattened1)
+dense2 = Dense(120, activation = 'relu')(dense1)
+predictions = Dense(1)(dense1)
 
 model = Model(inputs=main_input, outputs=predictions)
-model.compile(optimizer='Adam', loss='mse', metrics=['accuracy'])
+model.compile(optimizer='Adam', loss='mse')
 model.fit(X_train, Y_train, validation_split = 0.2, batch_size = 16, shuffle = True, epochs = 2)
 model.save('model.h5')
 
@@ -128,7 +129,7 @@ model.save('model.h5')
 
 
 
-"""www
+"""
 ### print the keys contained in the history object
 print(history_object.history.keys())
 
