@@ -1,3 +1,6 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
 import cv2
 import csv
 import tensorflow as tf 
@@ -9,7 +12,7 @@ from tensorflow.keras.layers import Activation, Dense, Flatten, Lambda, Cropping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MSE
 
-from tensorflow.keras.applications.mobilenet import MobileNet
+from tensorflow.keras.applications.vgg16 import VGG16
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -27,26 +30,29 @@ with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_Github/dri
 images = []
 measurements = []
 cf = 0.3 #correction factor of the steering angle for left and right images
-
+i = 0
 #remember to update this for loop, looks too clumsy
 for line in lines:
-    center_path = line[0]
-    left_path = line[1]
-    right_path = line[2]
-    center_image = cv2.imread(center_path)
-    center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2YUV)
-    left_image = cv2.imread(left_path)
-    left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2YUV)
-    right_image = cv2.imread(right_path)
-    right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2YUV)
-    center_image_flipped = np.fliplr(center_image)
-    left_image_flipped = np.fliplr(left_image)
-    right_image_flipped = np.fliplr(right_image)
-    imgs = [center_image, left_image, right_image, center_image_flipped, left_image_flipped, right_image_flipped]
-    images.extend(imgs)
-    measurement = float(line[3])
-    angs= [measurement, measurement+cf,measurement-cf, -measurement, -(measurement+cf), -(measurement-cf)]
-    measurements.extend(angs)
+    if i%2 == 0:
+        center_path = line[0]
+        left_path = line[1]
+        right_path = line[2]
+        center_image = cv2.imread(center_path)
+        center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2HLS)
+        left_image = cv2.imread(left_path)
+        left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2HLS)
+        right_image = cv2.imread(right_path)
+        right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2HLS)
+        center_image_flipped = np.fliplr(center_image)
+        left_image_flipped = np.fliplr(left_image)
+        right_image_flipped = np.fliplr(right_image)
+        imgs = [center_image, left_image, right_image, center_image_flipped, left_image_flipped, right_image_flipped]
+        images.extend(imgs)
+        measurement = float(line[3])
+        angs= [measurement, measurement+cf,measurement-cf, -measurement, -(measurement+cf), -(measurement-cf)]
+        measurements.extend(angs)
+    else:
+        pass
 
 """
 with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/driving_log.csv') as f:
@@ -74,15 +80,15 @@ X_train = np.array(images)
 Y_train = np.array(measurements)
 
 
-model = MobileNet(weights='imagenet', include_top=False, input_shape=(65, 300, 3))
+model = VGG16(weights='imagenet', include_top=False, input_shape=(66, 200, 3))
 
 for layer in model.layers:
     layer.trainable = False
 
 main_input = Input(shape=(160,320,3))
-#resized_input = Lambda(lambda image: tf.image.resize(image, (100, 150)))(main_input)
+resized_input = Lambda(lambda image: tf.image.resize(image, (66, 200)))(main_input)
 resized_input = Lambda(lambda image: image/255 - 0.5)(main_input)
-resized_input = Cropping2D(cropping=((70,25), (10,10)))(resized_input)
+#resized_input = Cropping2D(cropping=((70,25), (10,10)))(resized_input)
 model = model(resized_input)
 drop1 = Dropout(0.3)(model)
 flattened1 = Flatten()(drop1)
@@ -97,7 +103,7 @@ predictions = Dense(1)(dense4)
 
 model = Model(inputs=main_input, outputs=predictions)
 model.compile(optimizer='Adam', loss='mse')
-model.fit(X_train, Y_train, validation_split = 0.2, batch_size = 16, shuffle = True, epochs = 5)
+model.fit(X_train, Y_train, validation_split = 0.2, batch_size = 16, shuffle = True, epochs = 2)
 model.save('model.h5')
 
 """
