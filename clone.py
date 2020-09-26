@@ -21,7 +21,7 @@ session = tf.compat.v1.Session(config=config)
 lines = []
 
 #opening the csv file with the file names and measurements 
-with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_Github/driving_log.csv') as csvfile:
+with open('D:/Udacity_Proj_Data/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
@@ -38,11 +38,11 @@ for line in lines:
         left_path = line[1]
         right_path = line[2]
         center_image = cv2.imread(center_path)
-        center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2HLS)
+        center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2YUV)
         left_image = cv2.imread(left_path)
-        left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2HLS)
+        left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2YUV)
         right_image = cv2.imread(right_path)
-        right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2HLS)
+        right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2YUV)
         center_image_flipped = np.fliplr(center_image)
         left_image_flipped = np.fliplr(left_image)
         right_image_flipped = np.fliplr(right_image)
@@ -53,6 +53,8 @@ for line in lines:
         measurements.extend(angs)
     else:
         pass
+
+    #i = i+1
 
 """
 with open('C:/Users/manas/OneDrive - Clemson University/Documents/SDC_github/driving_log.csv') as f:
@@ -104,7 +106,7 @@ predictions = Dense(1)(dense4)
 model = Model(inputs=main_input, outputs=predictions)
 model.compile(optimizer='Adam', loss='mse')
 model.fit(X_train, Y_train, validation_split = 0.2, batch_size = 16, shuffle = True, epochs = 2)
-model.save('model.h5')
+model.save('models/model_yuv.h5')
 
 """
 model = Sequential()
@@ -135,7 +137,7 @@ model.add(tf.keras.layers.Dense(1))
 model.compile(loss='mse', optimizer = 'adam')
 history_object = model.fit(X_train, Y_train, validation_split = 0.2, shuffle = True, epochs = 5)
 
-model.save('model.h5')
+model.save('models/model_nvidia.h5')
 """
 #trying to use pretrained model to see how it works
 
