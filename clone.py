@@ -21,7 +21,7 @@ session = tf.compat.v1.Session(config=config)
 lines = []
 
 #opening the csv file with the file names and measurements 
-with open('D:/Udacity_Proj_Data/driving_log.csv') as csvfile:
+with open('C:/Users/manas/Downloads/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
